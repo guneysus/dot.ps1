@@ -6,7 +6,7 @@
 # $env:WVSC="C:\Program Files (x86)\Acunetix\core\wvsc.exe"
 
 $env:PATH += ";C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE";
-
+# $env:Path = ";C:\Users\AhmedGuneysu\.cargo\bin;$env:Path"
 
 $env:FNM_RESOLVE_ENGINES = "false"
 $env:FNM_DIR = "C:\Users\AhmedGuneysu\AppData\Roaming\fnm"
@@ -16,5 +16,7 @@ $env:FNM_NODE_DIST_MIRROR = "https://nodejs.org/dist"
 $env:FNM_COREPACK_ENABLED = "false"
 $env:FNM_VERSION_FILE_STRATEGY = "local"
 $env:FNM_ARCH = "x64"
+$env:COREHOST_TRACE = 0
+
 
 # $env:PATH = $env:PATH += ";C:\Program Files\nodejs\"

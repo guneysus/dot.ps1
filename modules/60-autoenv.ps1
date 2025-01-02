@@ -188,3 +188,13 @@ $validateAttr = (new-object ValidateScript {
 
 (Get-Variable PWD).Attributes.Add($validateAttr)
 
+
+(Get-Variable PWD).Attributes.Add((new-object ValidateScript { 
+      Write-Debug "[AutoVirtualEnv] $_"
+
+      $venv = ".\.venv\Scripts\activate.ps1"
+      if (test-path $venv) {
+        . $venv
+      }
+      return $true 
+    }))

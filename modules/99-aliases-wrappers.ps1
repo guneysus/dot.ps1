@@ -12,7 +12,7 @@ new-alias IP Get-IP4
 
 function Enter-Repos { [Alias('repos')]param() Push-Location "C:\repos" }
 function Enter-PersonalFolder { [Alias('personal')]param() Push-Location "C:\repos\guneysus" }
-
+function Enter-DockerFolder { [Alias('cd-docker')]param() Push-Location "C:\repos\guneysus\docker.git" }
 
 function gs { git status }
 function gaa { git add . }
@@ -83,11 +83,12 @@ function Add-Wrapper {
     # Check if we need to handle stdin
     $stdinRedirect = if ($defaultArgs -contains '-') {
         '$input | &'
-    } else {
+    }
+    else {
         '&'
     }
 
-    $functionBody =  "$stdinRedirect ""$path"" $($defaultArgs) `$args"
+    $functionBody = "$stdinRedirect ""$path"" $($defaultArgs) `$args"
 
     new-item -path function:\ -name "global:$name" -value $functionBody -Force | Out-Null
 }
@@ -113,3 +114,12 @@ add-wrapper "kubectl" "minikube" "kubectl", "--"
 
 
 xalias "exec" pwsh "-nop", "-nologo", "-noni", "-command", "-"
+
+
+function Find-DbContexts {
+    dotnet ef dbcontext list
+}
+
+function Get-Migrations {
+    dotnet ef migrations list
+}
