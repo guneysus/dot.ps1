@@ -69,6 +69,8 @@ xalias "exec" pwsh "-noprofile", -nologo, -command, -
 
 
 #>
+
+
 function Add-Wrapper {
     [Alias("xalias")]
     param (
@@ -86,10 +88,35 @@ function Add-Wrapper {
     }
 
     $functionBody = "$stdinRedirect ""$path"" $($defaultArgs) `$args"
-    
-    write-host -ForegroundColor Green $functionBody
+    # Store wrapper info in global variable
+    if (-not (Test-Path variable:global:Wrappers)) {
+        $Global:Wrappers = @{}
+    }
+    $Global:Wrappers[$name] = @{
+        Name = $name
+        Body = $functionBody
+    }
+    # write-host -ForegroundColor Green $functionBody
     new-item -path function:\ -name "global:$name" -value $functionBody -Force | Out-Null
 }
+
+function Get-Wrappers {
+    [Alias("wrappers")]
+    param()
+    
+    if (-not (Test-Path variable:global:Wrappers)) {
+        Write-Warning "No wrappers defined"
+        return
+    }
+
+    $Global:Wrappers.GetEnumerator() | ForEach-Object {
+        [PSCustomObject]@{
+            Name = $_.Value.Name
+            Body = $_.Value.Body
+        }
+    } | Format-Table -AutoSize
+}
+
 
 
 Function Invoke-UUID { [Alias('uuid')]param() [guid]::newguid().Guid }
