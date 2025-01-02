@@ -161,3 +161,7 @@ add-wrapper "install" "winget" "install"
 
 # Set-PSReadLineKeyHandler -Key Alt+p -ScriptBlock { pake Default }
 # Set-PSReadLineKeyHandler -Key Alt+c -ScriptBlock { docker-compose up }
+
+
+
+Add-Wrapper "dotnet-install-global-tool" "dotnet" "tool", "install", "--source", "https://api.nuget.org/v3/index.json", "-g"
