@@ -4,6 +4,31 @@ function Invoke-GitRewriteHistory_ResetAuthors {
 }
 
 
+# git config --local user.name "Ahmed Seref Guneysu"
+# git config --local user.email "949232+guneysus@users.noreply.github.com"
+# git config --local --edit
+# 
+
+<#
+[core]
+        repositoryformatversion = 0
+        filemode = false
+        bare = false
+        logallrefupdates = true
+        symlinks = false
+        ignorecase = true
+[remote "origin"]
+        url = git@github.com:guneysus/dot.ps1.git
+        fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "develop"]
+        remote = origin
+        merge = refs/heads/develop
+        vscode-merge-base = origin/develop
+[user]
+        email = 949232+guneysus@users.noreply.github.com
+        name = Ahmed Seref Guneysu
+#>
+
 <#
 .SYNOPSIS
 Short description
@@ -73,3 +98,53 @@ function New-BranchName {
     return $result
 }
 
+
+function Invoke-Clone {
+    [Alias('clone')]
+    param(
+        [Parameter(Mandatory = $true)] [string] $GitUrl,
+        [Parameter(Mandatory = $false)] [string] $Branch
+    )
+    
+    # Check if the URL is SSH or HTTPS
+    if ($GitUrl -match "^git@") {
+        # SSH URL, replace "git@" and ":" with "/" to normalize the URL for path creation
+        $urlParts = $GitUrl -replace "^git@", "" -replace ":", "/" -split "/"
+    }
+    elseif ($GitUrl -match "^https?://") {
+        # HTTPS URL, remove "www" if it exists
+        $urlParts = $GitUrl -replace "^https?://(www\.)?", "" -split "/"
+    }
+    else {
+        throw "Unsupported Git URL format."
+    }
+    
+    # Add '.git' suffix to the last segment (repository name)
+    $repoName = [System.IO.Path]::GetFileNameWithoutExtension($urlParts[-1])
+    $urlParts[-1] = "$repoName.git"
+    
+    # Construct the clone path in C:\repos by combining all URL parts
+    $clonePath = "C:\git"           # TODO: Use global environment variable
+    foreach ($part in $urlParts) {
+        $clonePath = Join-Path $clonePath $part
+    }
+    
+    # Ensure the directory structure exists
+    if (-not (Test-Path -Path $clonePath)) {
+        New-Item -ItemType Directory -Path $clonePath -Force
+    }
+    
+    # Clone the repository
+
+    if ( $PSBoundParameters.ContainsKey('Branch')) {
+        git clone --single-branch --branch $Branch $GitUrl $clonePath
+    }
+    else {
+        git clone $GitUrl $clonePath
+    }
+    
+    # Change to the cloned directory
+    Set-Location -Path $clonePath
+    
+    Write-Host "Repository cloned to $clonePath and switched to directory."
+}

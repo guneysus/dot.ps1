@@ -7,12 +7,10 @@ new-alias ver Get-Version
 new-alias GSer Get-SerialNumber	
 new-alias GML Get-Model
 new-alias GDE Get-ErrorsPerDay
-new-alias xf Xfind
 new-alias IP Get-IP4
 
-function Enter-Repos { [Alias('repos')]param() Push-Location "C:\repos" }
-function Enter-PersonalFolder { [Alias('personal')]param() Push-Location "C:\repos\guneysus" }
-
+function Enter-PersonalFolder { [Alias('personal')]param() Push-Location "C:\git\guneysus" }
+function Enter-DockerFolder { [Alias('cd-docker')]param() Push-Location "C:\git\guneysus\docker.git" }
 
 function gs { git status }
 function gaa { git add . }
@@ -50,7 +48,6 @@ add-wrapper "hugo" "C:\bin\hugo_0.135.0.exe"
 .EXAMPLE
 add-wrapper "ack" "perl" "$HOME\scoop\apps\ack\current\ack-single-file", "--ignore-dir=bin", "--ignore-dir=obj"
 
-
 .EXAMPLE
 
 add-wrapper "chrome-personal" "C:\Program Files\Google\Chrome\Application\chrome.exe"
@@ -83,25 +80,26 @@ function Add-Wrapper {
     # Check if we need to handle stdin
     $stdinRedirect = if ($defaultArgs -contains '-') {
         '$input | &'
-    } else {
+    }
+    else {
         '&'
     }
 
-    $functionBody =  "$stdinRedirect ""$path"" $($defaultArgs) `$args"
-
+    $functionBody = "$stdinRedirect ""$path"" $($defaultArgs) `$args"
+    
+    write-host -ForegroundColor Green $functionBody
     new-item -path function:\ -name "global:$name" -value $functionBody -Force | Out-Null
 }
 
 
 Function Invoke-UUID { [Alias('uuid')]param() [guid]::newguid().Guid }
 
-Function Invoke-Export { [Alias('export')]param() Get-ChildItem env: }
 
 
 
 add-wrapper hugo "C:\bin\hugo_0.135.0.exe"
 
-add-wrapper ack "perl" "$HOME\scoop\apps\ack\current\ack-single-file", "--ignore-dir=bin", "--ignore-dir=obj"
+# add-wrapper ack "perl" "$HOME\scoop\apps\ack\current\ack-single-file", "--ignore-dir=bin", "--ignore-dir=obj"
 
 add-wrapper compile-lisp "C:\Program Files\Steel Bank Common Lisp\sbcl.exe"
 
@@ -111,5 +109,59 @@ add-wrapper "chrome-automated" "C:\Program Files\Google\Chrome\Application\chrom
 
 add-wrapper "kubectl" "minikube" "kubectl", "--"
 
+# add-wrapper "exec" pwsh "-nop", "-nologo", "-noni", "-command", "-"
 
-xalias "exec" pwsh "-nop", "-nologo", "-noni", "-command", "-"
+add-wrapper "identity-ef" "dotnet" "ef", `
+    "--startup-project", ".\src\Invicti.UP.AppSec.Identity.Host", `
+    "--project", ".\src\Invicti.UP.AppSec.Identity.Storage"   # "--context", "Invicti.UP.AppSec.Identity.Storage.PostgresIdentityDbContext"
+
+add-wrapper "identity-ef-db-update" "dotnet" "ef", "database", "update", `
+    "--startup-project", ".\src\Invicti.UP.AppSec.Identity.Host", `
+    "--project", ".\src\Invicti.UP.AppSec.Identity.Storage", "--context", "Invicti.UP.AppSec.Identity.Storage.PostgresIdentityDbContext"
+
+add-wrapper "identity-ef-db-drop" "dotnet" "ef", "database", "drop", `
+    "--startup-project", ".\src\Invicti.UP.AppSec.Identity.Host", `
+    "--project", ".\src\Invicti.UP.AppSec.Identity.Storage", "--context", "Invicti.UP.AppSec.Identity.Storage.PostgresIdentityDbContext", "--force"
+
+
+add-wrapper "identity-ef-migrations" "dotnet" "ef", "migrations", "--startup-project", ".\src\Invicti.UP.AppSec.Identity.Host", "--project", ".\src\Invicti.UP.AppSec.Identity.Storage"
+
+add-wrapper "ns-ef" "dotnet" "ef", "--startup-project", ".\src\Invicti.UP.AppSec.Notifications.Host", "--project", ".\src\Invicti.UP.AppSec.Notifications.Storage"
+add-wrapper "ns-ef-migrations" "dotnet" "ef", "migrations", "--startup-project", ".\src\Invicti.UP.AppSec.Notifications.Host", "--project", ".\src\Invicti.UP.AppSec.Notifications.Storage"
+Add-Wrapper "lzd" "lazydocker"
+function Find-DbContexts {
+    dotnet ef dbcontext list
+}
+
+function Get-Migrations {
+    dotnet ef migrations list
+}
+
+set-alias which get-command
+
+# function Enter-Git { [Alias('repos')]param() Push-Location "C:\git" }
+# Add-Wrapper repos fzf --walker=dir, "--walker-root=C:/git/gitlab.com"
+
+
+function Invoke-NavigateProjects {
+    [Alias('repos')]
+    param()
+
+    Push-Location $(fzf --walker=dir --walker-root=C:/git/gitlab.com --walker-skip=.git,node_modules,bin,obj)
+}
+
+Add-Wrapper nav fzf --walker=dir
+
+add-wrapper "up-nats" "nats" "-s", "nats://s3cr3t@localhost:4321" #, '">"'
+
+# add-wrapper "up-nats" "nats" "sub", "-s", "nats://s3cr3t@localhost:4321" #, '">"'
+
+add-wrapper "install" "winget" "install"
+
+
+# Set-PSReadLineKeyHandler -Key Alt+p -ScriptBlock { pake Default }
+# Set-PSReadLineKeyHandler -Key Alt+c -ScriptBlock { docker-compose up }
+
+
+
+Add-Wrapper "dotnet-install-global-tool" "dotnet" "tool", "install", "--source", "https://api.nuget.org/v3/index.json", "-g"
