@@ -119,6 +119,7 @@ function Switch-Prompt {
           }
         }
 
+        Set-Title
         return "> "
       }
     }
@@ -262,3 +263,14 @@ Register-ArgumentCompleter -CommandName Switch-Prompt -ParameterName PromptName 
 
 # Example: Switch to 'Fancy' prompt
 # Switch-Prompt -PromptName Default
+
+
+function Set-Title() {
+  $repo = git rev-parse --show-toplevel 2>$null
+  if ($LASTEXITCODE -eq 0) {
+      $repo = Split-Path -Leaf $repo
+  } else {
+      $repo = Split-Path -Leaf (Get-Location)
+  }
+  $host.UI.RawUI.WindowTitle = $repo
+}
