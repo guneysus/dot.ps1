@@ -13,3 +13,15 @@ function Start-Project {
     }
     Get-ChildItem **/*Host.csproj -Recurse | ForEach-Object { dotnet run --project $_.FullName --no-build --no-restore }
 }
+
+function Set-GitLocalPersonalEmail {
+  git config --local user.email "949232+guneysus@users.noreply.github.com"
+  git config --local user.name "Ahmed Guneysu"
+}
+
+function Edit-GitGlobalConfig {
+    git config --global --edit
+}
+function Edit-GitLocalConfig {
+    git config --local --edit
+}

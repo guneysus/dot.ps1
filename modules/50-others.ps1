@@ -1,30 +1,5 @@
-Function xargs () {
-  param(  
-    [Parameter(
-      Position = 0, 
-      Mandatory = $true, 
-      ValueFromPipeline = $true,
-      ValueFromPipelineByPropertyName = $true)
-    ]
-    [String[]]$args,
-
-    [Parameter(Mandatory = $true)]
-    [String]$Command
-  )
-
-  process {
-    
-    write-debug $($args -join ';')
-
-    foreach ($arg in $args) {
-      Invoke-Expression "$Command".Replace("{}", $arg)
-      write-debug "$Command".Replace("{}", $arg)
-      Write-Output "$Command".Replace("{}", $arg)
-    }
-  }
-}
-
 Function XFind {
+  [alias("xf")]
   Param(
     [Parameter(Mandatory = $true)] 
     [string]$pattern
@@ -63,10 +38,6 @@ Function Get-ErrorsPerDay { Get-EventLog -LogName 'Application' -EntryType Error
 
 
 
-Function Get-DirectoryList {
-  [Alias('lsd')]param()
-  Get-ChildItem -Directory
-}
 
 function Format-Upper {
   <#

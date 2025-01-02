@@ -73,3 +73,53 @@ function New-BranchName {
     return $result
 }
 
+
+function Invoke-Clone {
+    [Alias('clone')]
+    param(
+        [Parameter(Mandatory = $true)] [string] $GitUrl,
+        [Parameter(Mandatory = $false)] [string] $Branch
+    )
+    
+    # Check if the URL is SSH or HTTPS
+    if ($GitUrl -match "^git@") {
+        # SSH URL, replace "git@" and ":" with "/" to normalize the URL for path creation
+        $urlParts = $GitUrl -replace "^git@", "" -replace ":", "/" -split "/"
+    }
+    elseif ($GitUrl -match "^https?://") {
+        # HTTPS URL, remove "www" if it exists
+        $urlParts = $GitUrl -replace "^https?://(www\.)?", "" -split "/"
+    }
+    else {
+        throw "Unsupported Git URL format."
+    }
+    
+    # Add '.git' suffix to the last segment (repository name)
+    $repoName = [System.IO.Path]::GetFileNameWithoutExtension($urlParts[-1])
+    $urlParts[-1] = "$repoName.git"
+    
+    # Construct the clone path in C:\repos by combining all URL parts
+    $clonePath = "C:\git"           # TODO: Use global environment variable
+    foreach ($part in $urlParts) {
+        $clonePath = Join-Path $clonePath $part
+    }
+    
+    # Ensure the directory structure exists
+    if (-not (Test-Path -Path $clonePath)) {
+        New-Item -ItemType Directory -Path $clonePath -Force
+    }
+    
+    # Clone the repository
+
+    if ( $PSBoundParameters.ContainsKey('Branch')) {
+        git clone --single-branch --branch $Branch $GitUrl $clonePath
+    }
+    else {
+        git clone $GitUrl $clonePath
+    }
+    
+    # Change to the cloned directory
+    Set-Location -Path $clonePath
+    
+    Write-Host "Repository cloned to $clonePath and switched to directory."
+}

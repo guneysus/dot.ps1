@@ -7,12 +7,11 @@ new-alias ver Get-Version
 new-alias GSer Get-SerialNumber	
 new-alias GML Get-Model
 new-alias GDE Get-ErrorsPerDay
-new-alias xf Xfind
 new-alias IP Get-IP4
 
-function Enter-Repos { [Alias('repos')]param() Push-Location "C:\repos" }
-function Enter-PersonalFolder { [Alias('personal')]param() Push-Location "C:\repos\guneysus" }
-function Enter-DockerFolder { [Alias('cd-docker')]param() Push-Location "C:\repos\guneysus\docker.git" }
+function Enter-Git { [Alias('repos')]param() Push-Location "C:\git" }
+function Enter-PersonalFolder { [Alias('personal')]param() Push-Location "C:\git\guneysus" }
+function Enter-DockerFolder { [Alias('cd-docker')]param() Push-Location "C:\git\guneysus\docker.git" }
 
 function gs { git status }
 function gaa { git add . }
@@ -95,13 +94,12 @@ function Add-Wrapper {
 
 Function Invoke-UUID { [Alias('uuid')]param() [guid]::newguid().Guid }
 
-Function Invoke-Export { [Alias('export')]param() Get-ChildItem env: }
 
 
 
 add-wrapper hugo "C:\bin\hugo_0.135.0.exe"
 
-add-wrapper ack "perl" "$HOME\scoop\apps\ack\current\ack-single-file", "--ignore-dir=bin", "--ignore-dir=obj"
+# add-wrapper ack "perl" "$HOME\scoop\apps\ack\current\ack-single-file", "--ignore-dir=bin", "--ignore-dir=obj"
 
 add-wrapper compile-lisp "C:\Program Files\Steel Bank Common Lisp\sbcl.exe"
 
@@ -124,3 +122,5 @@ function Find-DbContexts {
 function Get-Migrations {
     dotnet ef migrations list
 }
+
+set-alias which get-command
