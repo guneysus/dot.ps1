@@ -50,7 +50,6 @@ add-wrapper "hugo" "C:\bin\hugo_0.135.0.exe"
 .EXAMPLE
 add-wrapper "ack" "perl" "$HOME\scoop\apps\ack\current\ack-single-file", "--ignore-dir=bin", "--ignore-dir=obj"
 
-
 .EXAMPLE
 
 add-wrapper "chrome-personal" "C:\Program Files\Google\Chrome\Application\chrome.exe"
@@ -110,11 +109,11 @@ add-wrapper cpuz "C:\apps\cpuz.exe"
 
 add-wrapper "chrome-automated" "C:\Program Files\Google\Chrome\Application\chrome.exe" "--enable-automation"
 
-add-wrapper "kubectl" "minikube" "kubectl", "--"
+add-wrapper "kubectl" "minikube", "kubectl", "--"
 
+# add-wrapper "exec" pwsh "-nop", "-nologo", "-noni", "-command", "-"
 
-xalias "exec" pwsh "-nop", "-nologo", "-noni", "-command", "-"
-
+add-wrapper "ns-ef-migrations" "dotnet" "ef", "migrations", "--startup-project", ".\src\Invicti.UP.AppSec.Notifications.Host", "--project", ".\src\Invicti.UP.AppSec.Notifications.Storage"
 
 function Find-DbContexts {
     dotnet ef dbcontext list
