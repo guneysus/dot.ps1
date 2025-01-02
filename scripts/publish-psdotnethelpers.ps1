@@ -1,0 +1,1 @@
+﻿Publish-Module -Path .\PsDotnetHelpers -Repository guneysu -NuGetApiKey $env:MYGET_SECRET
