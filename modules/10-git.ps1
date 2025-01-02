@@ -4,6 +4,31 @@ function Invoke-GitRewriteHistory_ResetAuthors {
 }
 
 
+# git config --local user.name "Ahmed Seref Guneysu"
+# git config --local user.email "949232+guneysus@users.noreply.github.com"
+# git config --local --edit
+# 
+
+<#
+[core]
+        repositoryformatversion = 0
+        filemode = false
+        bare = false
+        logallrefupdates = true
+        symlinks = false
+        ignorecase = true
+[remote "origin"]
+        url = git@github.com:guneysus/dot.ps1.git
+        fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "develop"]
+        remote = origin
+        merge = refs/heads/develop
+        vscode-merge-base = origin/develop
+[user]
+        email = 949232+guneysus@users.noreply.github.com
+        name = Ahmed Seref Guneysu
+#>
+
 <#
 .SYNOPSIS
 Short description
