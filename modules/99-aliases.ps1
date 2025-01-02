@@ -31,13 +31,49 @@ Function .... { Push-Location .... }
 
 Function signTool { . "C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64\signtool.exe" $args }
 
-Function ack () {
-    perl "$HOME\scoop\apps\ack\current\ack-single-file" `
-        --ignore-dir=bin `
-        --ignore-dir=obj $args
+<#
+.SYNOPSIS
+Create wrapper powershell functions or shortuts to your applications optionally with default values.
+
+.DESCRIPTION
+Long description
+
+.PARAMETER name
+Parameter description
+
+.PARAMETER path
+Parameter description
+
+.EXAMPLE
+add-wrapper "hugo" "C:\bin\hugo_0.135.0.exe"
+
+.EXAMPLE
+add-wrapper "ack" "perl" "$HOME\scoop\apps\ack\current\ack-single-file", "--ignore-dir=bin", "--ignore-dir=obj"
+
+
+.EXAMPLE
+
+add-wrapper "chrome-personal" "C:\Program Files\Google\Chrome\Application\chrome.exe"
+add-wrapper "chrome-automated" "C:\Program Files\Google\Chrome\Application\chrome.exe" "--enable-automation"
+
+.NOTES
+General notes
+#>
+function Add-Wrapper {
+    param (
+        [Parameter(Mandatory = $true)][string]$name,
+        [Parameter(Mandatory = $true)][string]$path,
+        [Parameter(Mandatory = $false)][string[]]$defaultArgs
+    )
+
+    $functionBody = "& ""$path"" $($defaultArgs) `$args"
+
+
+    new-item -path function:\ -name "global:$name" -value $functionBody | Out-Null
 }
-  
+
+
 
 Function Invoke-UUID { [Alias('uuid')]param() [guid]::newguid().Guid }
 
-Function Invoke-Export  {[Alias('export')]param() Get-ChildItem env: }
+Function Invoke-Export { [Alias('export')]param() Get-ChildItem env: }

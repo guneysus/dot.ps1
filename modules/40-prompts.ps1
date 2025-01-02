@@ -2,7 +2,7 @@
 enum PromptType {
   Default
   Minimal
-  Simple
+  Basic
   TimeBased
   Fancy
   Advance
@@ -21,15 +21,15 @@ function Switch-Prompt {
   $prompts = @{
     "Default"       = {
       set-content Function:prompt {
-        "PS $($executionContext.SessionState.Path.CurrentLocation)> "
+        return "$($executionContext.SessionState.Path.CurrentLocation)> "
       }
     }
     "Minimal"       = {
       set-content Function:prompt {
-        "> "
+        return "> "
       }
     }
-    "Simple"        = {
+    "Basic"        = {
       set-content Function:prompt {
         write-host "$($executionContext.SessionState.Path.CurrentLocation.Path.Replace($HOME, "~")) $('$' * ($nestedPromptLevel + 1))" -NoNewline
 
@@ -39,17 +39,17 @@ function Switch-Prompt {
 				
         $host.ui.RawUI.WindowTitle = [System.IO.Path]::GetFileName($(Get-Location))
 				  
-        return " " 
+        return "> " 
       }
     }
     "TimeBased"     = {
       set-content Function:prompt {
-        "[$(Get-Date -Format 'HH:mm:ss')] PS $($executionContext.SessionState.Path.CurrentLocation)> "
+        return "[$(Get-Date -Format 'HH:mm:ss')] $($executionContext.SessionState.Path.CurrentLocation)> "
       }
     }
     "Fancy"         = {
       set-content Function:prompt {
-        "🐱 PS $($executionContext.SessionState.Path.CurrentLocation)> "
+        return "🐱 $($executionContext.SessionState.Path.CurrentLocation)> "
       }
     }
 
@@ -79,12 +79,12 @@ function Switch-Prompt {
         $host.UI.RawUI.WindowTitle = $currentDir  # $currentPath
 					
         # Write-Host " $([char]27)[38;5;227;48;5;28m  $([char]27)[38;5;254m$currentPath $([char]27)[0m " -NoNewline
-        Write-Host " $([char]27)[38;5;227;48;5;28m  $([char]27)[38;5;254m$currentDir $([char]27)[0m " -NoNewline
+        return " $([char]27)[38;5;227;48;5;28m $([char]27)[38;5;254m$currentDir $([char]27)[0m " 
 	
       } 
     }
     "MinimalCustom" = {
-      Set-Content Function:prompt {
+      set-content Function:prompt {
         # Start with a blank line, for breathing room :)
         Write-Host "" -NoNewline
 
@@ -119,7 +119,7 @@ function Switch-Prompt {
           }
         }
 
-        Write-Host " " -NoNewline
+        return "> "
       }
     }
     "Advance"       = {
@@ -147,7 +147,7 @@ function Switch-Prompt {
           Write-Host " $([char]27)[38;5;54;48;5;183m$PromptEnvironment$([char]27)[0m" -NoNewLine
         }
 			
-        Write-Output .NET SDK version
+        # Write .NET SDK version
         if ($null -ne (Get-Command "dotnet" -ErrorAction Ignore)) {
           $dotNetVersion = (& dotnet --version)
           Write-Host " $([char]27)[38;5;254;48;5;54m  $dotNetVersion $([char]27)[0m" -NoNewLine
@@ -229,10 +229,11 @@ function Switch-Prompt {
 			
         # Write PS> for desktop PowerShell, pwsh> for PowerShell Core
         if ($isDesktop) {
-          Write-Host " PS>" -NoNewLine -ForegroundColor $color
+          Write-Host ">>>>>>>>>>" -ForegroundColor Red
+          Write-Host "powershell >" -NoNewLine -ForegroundColor $color
         }
         else {
-          Write-Host " pwsh>" -NoNewLine -ForegroundColor $color
+          Write-Host "ps core >" -NoNewLine -ForegroundColor $color
         }
 			
         # Always have to return something or else we get the default prompt
