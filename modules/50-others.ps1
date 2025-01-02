@@ -103,6 +103,10 @@ function edit-profile {
 }
 
 
+function Edit-Profile_ { notepad2 $PROFILE }
+
+
+
 function Get-Definition {
   [alias("def")]
   param(
