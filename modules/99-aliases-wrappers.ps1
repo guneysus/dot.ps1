@@ -9,7 +9,6 @@ new-alias GML Get-Model
 new-alias GDE Get-ErrorsPerDay
 new-alias IP Get-IP4
 
-function Enter-Git { [Alias('repos')]param() Push-Location "C:\git" }
 function Enter-PersonalFolder { [Alias('personal')]param() Push-Location "C:\git\guneysus" }
 function Enter-DockerFolder { [Alias('cd-docker')]param() Push-Location "C:\git\guneysus\docker.git" }
 
@@ -87,7 +86,8 @@ function Add-Wrapper {
     }
 
     $functionBody = "$stdinRedirect ""$path"" $($defaultArgs) `$args"
-
+    
+    write-host -ForegroundColor Green $functionBody
     new-item -path function:\ -name "global:$name" -value $functionBody -Force | Out-Null
 }
 
@@ -111,10 +111,24 @@ add-wrapper "kubectl" "minikube" "kubectl", "--"
 
 # add-wrapper "exec" pwsh "-nop", "-nologo", "-noni", "-command", "-"
 
+add-wrapper "identity-ef" "dotnet" "ef", `
+    "--startup-project", ".\src\Invicti.UP.AppSec.Identity.Host", `
+    "--project", ".\src\Invicti.UP.AppSec.Identity.Storage"   # "--context", "Invicti.UP.AppSec.Identity.Storage.PostgresIdentityDbContext"
+
+add-wrapper "identity-ef-db-update" "dotnet" "ef", "database", "update", `
+    "--startup-project", ".\src\Invicti.UP.AppSec.Identity.Host", `
+    "--project", ".\src\Invicti.UP.AppSec.Identity.Storage", "--context", "Invicti.UP.AppSec.Identity.Storage.PostgresIdentityDbContext"
+
+add-wrapper "identity-ef-db-drop" "dotnet" "ef", "database", "drop", `
+    "--startup-project", ".\src\Invicti.UP.AppSec.Identity.Host", `
+    "--project", ".\src\Invicti.UP.AppSec.Identity.Storage", "--context", "Invicti.UP.AppSec.Identity.Storage.PostgresIdentityDbContext", "--force"
+
+
+add-wrapper "identity-ef-migrations" "dotnet" "ef", "migrations", "--startup-project", ".\src\Invicti.UP.AppSec.Identity.Host", "--project", ".\src\Invicti.UP.AppSec.Identity.Storage"
+
 add-wrapper "ns-ef" "dotnet" "ef", "--startup-project", ".\src\Invicti.UP.AppSec.Notifications.Host", "--project", ".\src\Invicti.UP.AppSec.Notifications.Storage"
-
 add-wrapper "ns-ef-migrations" "dotnet" "ef", "migrations", "--startup-project", ".\src\Invicti.UP.AppSec.Notifications.Host", "--project", ".\src\Invicti.UP.AppSec.Notifications.Storage"
-
+Add-Wrapper "lzd" "lazydocker"
 function Find-DbContexts {
     dotnet ef dbcontext list
 }
@@ -124,3 +138,26 @@ function Get-Migrations {
 }
 
 set-alias which get-command
+
+# function Enter-Git { [Alias('repos')]param() Push-Location "C:\git" }
+# Add-Wrapper repos fzf --walker=dir, "--walker-root=C:/git/gitlab.com"
+
+
+function Invoke-NavigateProjects {
+    [Alias('repos')]
+    param()
+
+    Push-Location $(fzf --walker=dir --walker-root=C:/git/gitlab.com --walker-skip=.git,node_modules,bin,obj)
+}
+
+Add-Wrapper nav fzf --walker=dir
+
+add-wrapper "up-nats" "nats" "-s", "nats://s3cr3t@localhost:4321" #, '">"'
+
+# add-wrapper "up-nats" "nats" "sub", "-s", "nats://s3cr3t@localhost:4321" #, '">"'
+
+add-wrapper "install" "winget" "install"
+
+
+# Set-PSReadLineKeyHandler -Key Alt+p -ScriptBlock { pake Default }
+# Set-PSReadLineKeyHandler -Key Alt+c -ScriptBlock { docker-compose up }
