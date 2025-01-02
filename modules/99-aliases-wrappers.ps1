@@ -54,27 +54,62 @@ add-wrapper "ack" "perl" "$HOME\scoop\apps\ack\current\ack-single-file", "--igno
 .EXAMPLE
 
 add-wrapper "chrome-personal" "C:\Program Files\Google\Chrome\Application\chrome.exe"
-add-wrapper "chrome-automated" "C:\Program Files\Google\Chrome\Application\chrome.exe" "--enable-automation"
+
+.EXAMPLE
+add-wrapper "chrome-automated" "C:\Program Files\Google\Chrome\Application\chrome.exe" "--enable-automation","other","extra", "arguments"
+
+.EXAMPLE
+xalias "exec" pwsh -noprofile, -nologo
 
 .NOTES
 General notes
+
+STDIN redirection does not work as expected.
+
+So this may not work:
+
+xalias "exec" pwsh "-noprofile", -nologo, -command, -
+
+
 #>
 function Add-Wrapper {
+    [Alias("xalias")]
     param (
         [Parameter(Mandatory = $true)][string]$name,
         [Parameter(Mandatory = $true)][string]$path,
         [Parameter(Mandatory = $false)][string[]]$defaultArgs
     )
 
-    $functionBody = "& ""$path"" $($defaultArgs) `$args"
+    # Check if we need to handle stdin
+    $stdinRedirect = if ($defaultArgs -contains '-') {
+        '$input | &'
+    } else {
+        '&'
+    }
 
+    $functionBody =  "$stdinRedirect ""$path"" $($defaultArgs) `$args"
 
-    new-item -path function:\ -name "global:$name" -value $functionBody | Out-Null
+    new-item -path function:\ -name "global:$name" -value $functionBody -Force | Out-Null
 }
-
 
 
 Function Invoke-UUID { [Alias('uuid')]param() [guid]::newguid().Guid }
 
 Function Invoke-Export { [Alias('export')]param() Get-ChildItem env: }
 
+
+
+add-wrapper hugo "C:\bin\hugo_0.135.0.exe"
+
+add-wrapper ack "perl" "$HOME\scoop\apps\ack\current\ack-single-file", "--ignore-dir=bin", "--ignore-dir=obj"
+
+add-wrapper compile-lisp "C:\Program Files\Steel Bank Common Lisp\sbcl.exe"
+
+add-wrapper cpuz "C:\apps\cpuz.exe"
+
+add-wrapper "chrome-automated" "C:\Program Files\Google\Chrome\Application\chrome.exe" "--enable-automation"
+
+add-wrapper "kubectl" "minikube" "kubectl", "--"
+
+
+xalias "exec" pwsh "-nop", "-nologo", "-noni", "-command", "-"
