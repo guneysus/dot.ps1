@@ -105,7 +105,7 @@ function Switch-Prompt {
 			  
         switch ($path) {
           $homePath { 
-            Write-Host "$ESC[32m$($homeSymbol)> $ESC[0m" -NoNewLine
+            Write-Host "$ESC[32m$($homeSymbol)$ESC[0m" -NoNewLine
             break 
           }
           default {
@@ -115,7 +115,7 @@ function Switch-Prompt {
             $arr | Select-Object -Skip 1 -Last ($arr.Length - 2) | ForEach-Object { $newArray += ($_.Trim('.'))[0] }
             $newArray += $($arr | Select-Object -Last 1)
             $joined = ($newArray -join $sep )
-            Write-Host " $ESC[96m$($joined)>$ESC[0m" -NoNewLine
+            Write-Host " $ESC[96m$($joined)$ESC[0m" -NoNewLine
           }
         }
 
