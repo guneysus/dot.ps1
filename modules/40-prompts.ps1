@@ -8,6 +8,7 @@ enum PromptType {
   Advance
   Custom
   MinimalCustom
+  MinimalCustomAlt
 }
 
 # Define the Switch-Prompt function
@@ -19,17 +20,17 @@ function Switch-Prompt {
 
   # Define custom prompt functions
   $prompts = @{
-    "Default"       = {
+    "Default"          = {
       set-content Function:prompt {
         return "$($executionContext.SessionState.Path.CurrentLocation)> "
       }
     }
-    "Minimal"       = {
+    "Minimal"          = {
       set-content Function:prompt {
         return "> "
       }
     }
-    "Basic"        = {
+    "Basic"            = {
       set-content Function:prompt {
         write-host "$($executionContext.SessionState.Path.CurrentLocation.Path.Replace($HOME, "~")) $('$' * ($nestedPromptLevel + 1))" -NoNewline
 
@@ -42,18 +43,18 @@ function Switch-Prompt {
         return "> " 
       }
     }
-    "TimeBased"     = {
+    "TimeBased"        = {
       set-content Function:prompt {
         return "[$(Get-Date -Format 'HH:mm:ss')] $($executionContext.SessionState.Path.CurrentLocation)> "
       }
     }
-    "Fancy"         = {
+    "Fancy"            = {
       set-content Function:prompt {
         return "🐱 $($executionContext.SessionState.Path.CurrentLocation)> "
       }
     }
 
-    "Custom"        = {
+    "Custom"           = {
       set-content Function:prompt {
         Write-Host ""
 
@@ -83,7 +84,7 @@ function Switch-Prompt {
 	
       } 
     }
-    "MinimalCustom" = {
+    "MinimalCustom"    = {
       set-content Function:prompt {
         # Start with a blank line, for breathing room :)
         Write-Host "" -NoNewline
@@ -123,7 +124,46 @@ function Switch-Prompt {
         return "> "
       }
     }
-    "Advance"       = {
+      "MinimalCustomAlt" = {
+        set-content Function:prompt {
+            # Start with a blank line, for breathing room :)
+            Write-Host ""
+
+            # Write the current Git information
+            if (Get-Command "Get-GitDirectory" -ErrorAction Ignore) {
+                $gitDirectory = Get-GitDirectory
+                if ($null -ne $gitDirectory) {
+                    Write-Host (Write-VcsStatus) -NoNewline
+                }
+            }
+
+            $path = $executionContext.SessionState.Path.CurrentLocation.Path
+            $homePath = (Resolve-Path "~").Path
+            $ESC = [char]27
+            $homeSymbol = "🏠" # 🏠 symbol for the home directory
+
+            switch ($path) {
+                $homePath { 
+                    Write-Host "$ESC[32m$homeSymbol$ESC[0m" -NoNewline
+                    break 
+                }
+                default {
+                    $cwd = [System.IO.DirectoryInfo]::new($path).Name
+                    Write-Host " $ESC[96m$cwd$ESC[0m" -NoNewline
+                }
+            }
+
+            # Ensure Set-Title is defined or called safely
+            if (Get-Command "Set-Title" -ErrorAction Ignore) {
+                Set-Title
+            }
+
+            return "> "
+        }
+      }
+
+
+    "Advance"          = {
       set-content Function:prompt {
         # Start with a blank line, for breathing room :)
         Write-Host ""
@@ -268,9 +308,10 @@ Register-ArgumentCompleter -CommandName Switch-Prompt -ParameterName PromptName 
 function Set-Title() {
   $repo = git rev-parse --show-toplevel 2>$null
   if ($LASTEXITCODE -eq 0) {
-      $repo = Split-Path -Leaf $repo
-  } else {
-      $repo = Split-Path -Leaf (Get-Location)
+    $repo = Split-Path -Leaf $repo
+  }
+  else {
+    $repo = Split-Path -Leaf (Get-Location)
   }
   $host.UI.RawUI.WindowTitle = $repo
 }

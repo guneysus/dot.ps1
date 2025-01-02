@@ -109,9 +109,11 @@ add-wrapper cpuz "C:\apps\cpuz.exe"
 
 add-wrapper "chrome-automated" "C:\Program Files\Google\Chrome\Application\chrome.exe" "--enable-automation"
 
-add-wrapper "kubectl" "minikube", "kubectl", "--"
+add-wrapper "kubectl" "minikube" "kubectl", "--"
 
 # add-wrapper "exec" pwsh "-nop", "-nologo", "-noni", "-command", "-"
+
+add-wrapper "ns-ef" "dotnet" "ef", "--startup-project", ".\src\Invicti.UP.AppSec.Notifications.Host", "--project", ".\src\Invicti.UP.AppSec.Notifications.Storage"
 
 add-wrapper "ns-ef-migrations" "dotnet" "ef", "migrations", "--startup-project", ".\src\Invicti.UP.AppSec.Notifications.Host", "--project", ".\src\Invicti.UP.AppSec.Notifications.Storage"
 
