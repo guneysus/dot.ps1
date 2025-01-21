@@ -1,13 +1,13 @@
-new-alias apt winget
-new-alias e explorer
-new-alias vs "C:\Program Files\Microsoft Visual Studio\2022\Preview\Common7\IDE\devenv.exe"
-new-alias gg lazygit
-new-alias gbt Get-BootTime
-new-alias ver Get-Version
-new-alias GSer Get-SerialNumber	
-new-alias GML Get-Model
-new-alias GDE Get-ErrorsPerDay
-new-alias IP Get-IP4
+set-alias apt winget
+set-alias e explorer
+set-alias vs "C:\Program Files\Microsoft Visual Studio\2022\Preview\Common7\IDE\devenv.exe"
+set-alias gg lazygit
+set-alias gbt Get-BootTime
+set-alias ver Get-Version
+set-alias GSer Get-SerialNumber	
+set-alias GML Get-Model
+set-alias GDE Get-ErrorsPerDay
+set-alias IP Get-IP4
 
 function Enter-PersonalFolder { [Alias('personal')]param() Push-Location "C:\git\guneysus" }
 function Enter-DockerFolder { [Alias('cd-docker')]param() Push-Location "C:\git\guneysus\docker.git" }
@@ -177,7 +177,14 @@ function Invoke-NavigateProjects {
     Push-Location $(fzf --walker=dir --walker-root=C:/git/gitlab.com --walker-skip=.git,node_modules,bin,obj)
 }
 
-Add-Wrapper nav fzf --walker=dir
+function Invoke-Nav {
+    # Add-Wrapper nav fzf --walker=dir
+    [Alias('nav')]
+    param()
+
+    Push-Location $(fzf --walker=dir --walker-skip=.git,node_modules,bin,obj)
+}
+
 
 add-wrapper "up-nats" "nats" "-s", "nats://s3cr3t@localhost:4321" #, '">"'
 
@@ -192,3 +199,7 @@ add-wrapper "install" "winget" "install"
 
 
 Add-Wrapper "dotnet-install-global-tool" "dotnet" "tool", "install", "--source", "https://api.nuget.org/v3/index.json", "-g"
+
+add-wrapper "create-virtual-env" "python" "-m", "venv", ".venv"
+
+add-wrapper "upgrade-pip" "python" "-m", "pip", "install", "--upgrade",  "pip"

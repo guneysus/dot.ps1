@@ -1,4 +1,4 @@
-
+Write-Host "Importing dot.ps1"
 
 # $env:Path += ';C:\Windows\Microsoft.NET\Framework64\v4.0.30319';
 # $env:Path += ";C:\Windows\System32\inetsrv";
