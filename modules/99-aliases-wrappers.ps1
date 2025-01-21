@@ -203,3 +203,5 @@ Add-Wrapper "dotnet-install-global-tool" "dotnet" "tool", "install", "--source",
 add-wrapper "create-virtual-env" "python" "-m", "venv", ".venv"
 
 add-wrapper "upgrade-pip" "python" "-m", "pip", "install", "--upgrade",  "pip"
+
+add-wrapper "notepad2" "C:\Program Files\Notepad2\Notepad2.exe"
