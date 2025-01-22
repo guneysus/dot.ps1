@@ -12,13 +12,20 @@ An example
 General notes
 #>
 function Read-Env {
+  $envVars = @()
   get-content .env | ForEach-Object {
+    if ($_.Trim().StartsWith('#') -or [string]::IsNullOrWhiteSpace($_)) {
+      # Skip comment lines and empty lines
+      return
+    }
     $name, $value = $_.split('=')
-    Write-Debug "Name: $name Value: $value"
-    set-content env:\$name $value
+    Write-Debug "$name=$value"
+    # set-content env:\$name $value # PSCore
+    Set-Item -Path "env:\$name" -Value $value
+    $envVars += [PSCustomObject]@{ Name = $name; Value = $value }
   }
+  $envVars | Format-Table -AutoSize
 }
-
 <#
 .SYNOPSIS
 Imports variables from an ENV file
